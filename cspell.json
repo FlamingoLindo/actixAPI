@@ -1,0 +1,15 @@
+{
+    "version": "0.2",
+    "ignorePaths": [],
+    "dictionaryDefinitions": [],
+    "dictionaries": [
+        "en",
+        "pt-br"
+    ],
+    "words": [
+        "actix"
+    ],
+    "ignoreWords": [],
+    "import": [],
+    "language": "en,pt-br"
+}
