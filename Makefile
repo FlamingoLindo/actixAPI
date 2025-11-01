@@ -4,6 +4,15 @@ build:
 run:
 	cargo run
 
+makemigrations:
+	sqlx migrate add -r init
+
+migrate:
+	sqlx migrate run
+
+migrate-revert:
+	sqlx migrate revert
+
 install:
 	cargo add actix-web
 	cargo add actix-cors

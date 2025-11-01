@@ -15,7 +15,8 @@
         "uuid",
         "sqlx",
         "jsonwebtoken",
-        "healthchecker"
+        "healthchecker",
+        "makemigrations","ossp"
     ],
     "ignoreWords": [],
     "import": [],
