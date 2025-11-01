@@ -1,28 +1,62 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
-
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello word!")
-}
-
-#[post("/echo")]
-async fn echo(body: String) -> impl  Responder{
-    HttpResponse::Ok().body(body)
-}
-
-async fn manual_hello() -> impl  Responder {
-    HttpResponse::Ok().body("Yo!")
+mod routes;
+use actix_cors::Cors;
+use actix_web::{App, HttpServer, http::header, middleware::Logger};
+use routes::{config::config, health_route::health_checker_handler};
+use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
+pub struct AppState {
+    db: Pool<Postgres>,
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    if std::env::var_os("RUST_LOG").is_none() {
+        unsafe {
+            std::env::set_var("RUST_LOG", "actix_web=info");
+        }
+    }
+    dotenv::dotenv().ok();
+    env_logger::init();
+
+    let database_url: String = std::env::var("DB_URL").expect("Database URL not found!");
+    let pool: Pool<Postgres> = match PgPoolOptions::new()
+        .max_connections(10)
+        .connect(&database_url)
+        .await
+    {
+        Ok(pool) => {
+            println!("Database connection was a success!");
+            pool
+        }
+        Err(err) => {
+            println!(
+                "There has been an error during the database connection! {:?}",
+                err
+            );
+            std::process::exit(1);
+        }
+    };
+
+    println!("Server started!");
+
+    HttpServer::new(move || {
+        let cors = Cors::default()
+            .allowed_origin("http://localhost:3000")
+            .allowed_methods(vec!["GET", "POST", "PUT", "PATCH", "DELETE"])
+            .allowed_headers(vec![
+                header::CONTENT_TYPE,
+                header::AUTHORIZATION,
+                header::ACCEPT,
+            ])
+            .supports_credentials();
+
         App::new()
-            .service(hello)
-            .service(echo)
-            .route("/hey", web::get().to(manual_hello))
+            .app_data(actix_web::web::Data::new(AppState { db: pool.clone() }))
+            .service(health_checker_handler)
+            .configure(config)
+            .wrap(cors)
+            .wrap(Logger::default())
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("127.0.0.1", 8000))?
     .run()
     .await
 }

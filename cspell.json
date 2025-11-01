@@ -14,7 +14,8 @@
         "dotenv",
         "uuid",
         "sqlx",
-        "jsonwebtoken"
+        "jsonwebtoken",
+        "healthchecker"
     ],
     "ignoreWords": [],
     "import": [],
