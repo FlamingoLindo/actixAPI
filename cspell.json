@@ -7,7 +7,14 @@
         "pt-br"
     ],
     "words": [
-        "actix"
+        "actix",
+        "postgres",
+        "serde",
+        "chrono",
+        "dotenv",
+        "uuid",
+        "sqlx",
+        "jsonwebtoken"
     ],
     "ignoreWords": [],
     "import": [],
