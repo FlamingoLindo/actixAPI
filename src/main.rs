@@ -1,4 +1,5 @@
 mod routes;
+mod models;
 use actix_cors::Cors;
 use actix_web::{App, HttpServer, http::header, middleware::Logger};
 use routes::{config::config, health_route::health_checker_handler};
@@ -17,7 +18,7 @@ async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     env_logger::init();
 
-    let database_url: String = std::env::var("DB_URL").expect("Database URL not found!");
+    let database_url: String = std::env::var("DATABASE_URL").expect("Database URL not found!");
     let pool: Pool<Postgres> = match PgPoolOptions::new()
         .max_connections(10)
         .connect(&database_url)
