@@ -1,5 +1,6 @@
-mod routes;
 mod models;
+mod routes;
+mod steam;
 use actix_cors::Cors;
 use actix_web::{App, HttpServer, http::header, middleware::Logger};
 use routes::{config::config, health_route::health_checker_handler};
