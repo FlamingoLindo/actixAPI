@@ -14,6 +14,7 @@ migrate-revert:
 	sqlx migrate revert
 
 install:
+	cargo add reqwest
 	cargo add actix-web
 	cargo add actix-cors
 	cargo add serde_json
