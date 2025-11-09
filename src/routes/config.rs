@@ -1,6 +1,12 @@
 use actix_web::web;
 
-use super::user::{create_user, delete_user, get_user, get_users, update_user};
+use super::user::{
+    get_users::get_users,
+    get_user::get_user,
+    create_user::create_user,
+    update_user::update_user,
+    delete_user::delete_user,
+};
 
 pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api/users")
