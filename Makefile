@@ -2,7 +2,7 @@ build:
 	cargo build
 
 run:
-	cargo run
+	watchexec -e rs -r cargo run
 
 fix:
 	cargo fix --bin "actixAPI"
@@ -30,3 +30,4 @@ install:
 	cargo add argon2
 	cargo add rand_core --features "std"
 	cargo install sqlx-cli
+	cargo install --locked watchexec-cli

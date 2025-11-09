@@ -29,7 +29,8 @@
         "communityvisibilitystate",
         "timecreated",
         "loccountrycode",
-        "gameextrainfo"
+        "gameextrainfo",
+        "watchexec"
     ],
     "ignoreWords": [],
     "import": [],
