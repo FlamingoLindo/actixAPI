@@ -1,16 +1,12 @@
 use crate::AppState;
-use crate::models::ResponseStatus;
-use crate::models::User::user::UserModel;
+use crate::models::user::user::UserModel;
 use crate::models::dto::{
-    CreateUserSchema, GetUser, GetUserResponse, GetUsers, GetUsersResponse, UpdateUserSchema,
-    UserCreationResponse, UserUpdateResponse,
+    UpdateUserSchema, UserUpdateResponse,
 };
-use crate::steam::steam_api_response::SteamResponse;
 
-use actix_web::{HttpResponse, Responder, delete, get, post, put, web};
-use chrono::{DateTime, Utc};
+use actix_web::{HttpResponse, Responder, put, web};
+use chrono::Utc;
 use serde_json::json;
-use uuid::Uuid;
 
 #[put("/user/{id}")]
 async fn update_user(

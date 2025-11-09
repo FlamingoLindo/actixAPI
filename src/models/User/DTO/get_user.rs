@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::models::responseStatus::ResponseStatus;
+use crate::models::response_status::ResponseStatus;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetUser {

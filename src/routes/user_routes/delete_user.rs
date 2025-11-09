@@ -1,15 +1,6 @@
 use crate::AppState;
-use crate::models::dto::{
-    CreateUserSchema, GetUser, GetUserResponse, GetUsers, GetUsersResponse,
-    UpdateUserSchema, UserCreationResponse, UserUpdateResponse,
-};
-use crate::models::ResponseStatus;
-use crate::models::User::user::UserModel;
-use crate::steam::steam_api_response::SteamResponse;
 
-use actix_web::{HttpResponse, Responder, delete, get, post, put, web};
-use chrono::{DateTime, Utc};
-use serde_json::json;
+use actix_web::{HttpResponse, Responder, delete, web};
 use uuid::Uuid;
 
 #[delete("/user/{id}")]

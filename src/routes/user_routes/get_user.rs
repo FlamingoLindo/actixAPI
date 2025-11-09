@@ -1,16 +1,11 @@
 use crate::AppState;
 use crate::models::ResponseStatus;
-use crate::models::User::user::UserModel;
 use crate::models::dto::{
-    CreateUserSchema, GetUser, GetUserResponse, GetUsers, GetUsersResponse, UpdateUserSchema,
-    UserCreationResponse, UserUpdateResponse,
+    GetUser, GetUserResponse,
 };
-use crate::steam::steam_api_response::SteamResponse;
 
-use actix_web::{HttpResponse, Responder, delete, get, post, put, web};
-use chrono::{DateTime, Utc};
+use actix_web::{HttpResponse, Responder, get, web};
 use serde_json::json;
-use uuid::Uuid;
 
 #[get("/user/{id}")]
 async fn get_user(steam_id: web::Path<String>, data: web::Data<AppState>) -> impl Responder {

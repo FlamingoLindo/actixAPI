@@ -4,6 +4,9 @@ build:
 run:
 	cargo run
 
+fix:
+	cargo fix --bin "actixAPI"
+
 makemigrations:
 	sqlx migrate add -r init
 

@@ -1,3 +1,3 @@
 pub mod config;
 pub mod health_route;
-pub mod user;
+pub mod user_routes;

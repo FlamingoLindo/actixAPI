@@ -1,6 +1,6 @@
 use actix_web::web;
 
-use super::user::{
+use super::user_routes::{
     get_users::get_users,
     get_user::get_user,
     create_user::create_user,

@@ -1,9 +1,9 @@
-pub mod createUser;
-pub mod getUser;
-pub mod getUsers;
-pub mod updateUser;
+pub mod create_user;
+pub mod get_user;
+pub mod get_users;
+pub mod update_user;
 
-pub use createUser::{CreateUserSchema, UserCreationResponse};
-pub use getUser::{GetUser, GetUserResponse};
-pub use getUsers::{GetUsers, GetUsersResponse};
-pub use updateUser::{UpdateUserSchema, UserUpdateResponse};
+pub use create_user::{CreateUserSchema, UserCreationResponse};
+pub use get_user::{GetUser, GetUserResponse};
+pub use get_users::{GetUsers, GetUsersResponse};
+pub use update_user::{UpdateUserSchema, UserUpdateResponse};
