@@ -1,5 +1,7 @@
 use crate::AppState;
-use crate::models::dto::{CreateUserSchema, UserCreationResponse};
+use crate::models::dto::{
+    CreateUserSchema, GetUsers, GetUsersResponse, ResponseStatus, UserCreationResponse,
+};
 use crate::models::user::{UpdateUserSchema, UserModel};
 use crate::steam::steam_api_response::SteamResponse;
 
@@ -100,9 +102,12 @@ pub async fn create_user(
 
 #[get("/")]
 pub async fn get_users(data: web::Data<AppState>) -> impl Responder {
-    let query_result = sqlx::query_as!(UserModel, "SELECT * FROM users")
-        .fetch_all(&data.db)
-        .await;
+    let query_result = sqlx::query_as!(
+        GetUsers,
+        "SELECT steam_id, username, avatar, pf_url, current_game FROM users"
+    )
+    .fetch_all(&data.db)
+    .await;
 
     if query_result.is_err() {
         let message = "There has been an error when trying to fetch all users, please try again!";
@@ -112,10 +117,13 @@ pub async fn get_users(data: web::Data<AppState>) -> impl Responder {
 
     let users = query_result.unwrap();
 
-    let json_response =
-        serde_json::json!({"status": "success", "count": users.len(), "users": users});
+    let response_dto = GetUsersResponse {
+        status: ResponseStatus::Success,
+        count: users.len(),
+        users: users,
+    };
 
-    HttpResponse::Ok().json(json_response)
+    HttpResponse::Ok().json(response_dto)
 }
 
 #[get("/user/{id}")]
