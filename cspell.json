@@ -30,7 +30,7 @@
         "timecreated",
         "loccountrycode",
         "gameextrainfo",
-        "watchexec"
+        "watchexec", "httpauth"
     ],
     "ignoreWords": [],
     "import": [],

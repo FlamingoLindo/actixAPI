@@ -1,3 +1,4 @@
+mod middleware;
 mod models;
 mod routes;
 mod steam;

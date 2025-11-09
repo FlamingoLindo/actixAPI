@@ -16,6 +16,9 @@ migrate:
 migrate-revert:
 	sqlx migrate revert
 
+confuse:
+	cargo metadata --format-version 1 | Out-Null
+
 install:
 	cargo add reqwest
 	cargo add actix-web
@@ -31,3 +34,6 @@ install:
 	cargo add rand_core --features "std"
 	cargo install sqlx-cli
 	cargo install --locked watchexec-cli
+	cargo add jsonwebtoken
+	cargo add actix-web-httpauth
+	cargo add jsonwebtoken --features aws_lc_rs

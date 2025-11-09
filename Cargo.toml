@@ -6,10 +6,12 @@ edition = "2024"
 [dependencies]
 actix-cors = "0.7.1"
 actix-web = "4"
+actix-web-httpauth = "0.8.2"
 argon2 = "0.5.3"
 chrono = { version = "0.4.42", features = ["serde"] }
 dotenv = "0.15.0"
 env_logger = "0.11.8"
+jsonwebtoken = { version = "10.2.0", features = ["aws_lc_rs"] }
 rand_core = { version = "0.9.3", features = ["std"] }
 reqwest = { version = "0.12.24", features = ["json"] }
 serde = { version = "1.0.228", features = ["derive"] }
