@@ -25,11 +25,6 @@ pub struct UserModel {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CreateUserSchema {
-    pub steam_id: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateUserSchema {
     pub username: Option<String>,
     pub pf_url: Option<String>,

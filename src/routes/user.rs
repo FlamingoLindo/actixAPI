@@ -1,5 +1,6 @@
 use crate::AppState;
-use crate::models::user::{CreateUserSchema, UpdateUserSchema, UserModel};
+use crate::models::dto::{CreateUserSchema, UserCreationResponse};
+use crate::models::user::{UpdateUserSchema, UserModel};
 use crate::steam::steam_api_response::SteamResponse;
 
 use actix_web::{HttpResponse, Responder, delete, get, post, put, web};
@@ -14,16 +15,15 @@ pub async fn create_user(
 ) -> impl Responder {
     dotenv::dotenv().ok();
 
-    let steam_id = body.steam_id.clone();
-    let query_result = sqlx::query_as!(
+    let exiting_quey = sqlx::query_as!(
         UserModel,
         "SELECT * FROM users WHERE steam_id = $1",
-        steam_id
+        body.steam_id
     )
     .fetch_one(&data.db)
     .await;
 
-    if query_result.is_ok() {
+    if exiting_quey.is_ok() {
         return HttpResponse::Conflict()
             .json(serde_json::json!({"status": "error", "message": "This user is already registered in the database!"}));
     }
@@ -79,9 +79,15 @@ pub async fn create_user(
     .await;
 
     match query_result {
-        Ok(user) => {
+        Ok(db_user) => {
+            let response_dto = UserCreationResponse {
+                username: db_user.username,
+                pf_url: db_user.pf_url,
+                avatar: db_user.avatar,
+            };
+
             let user_response = serde_json::json!({"status": "success", "data": serde_json::json!({
-                "user": user
+                "user": response_dto
             })});
             return HttpResponse::Ok().json(user_response);
         }
