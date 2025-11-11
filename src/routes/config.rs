@@ -1,3 +1,4 @@
+use super::admin_routes::create_admin::create_admin;
 use super::user_routes::{
     create_user::create_user, delete_user::delete_user, get_user::get_user, get_users::get_users,
     update_user::update_user,
@@ -24,6 +25,9 @@ pub fn config(conf: &mut web::ServiceConfig) {
                 .service(delete_user),
         );
 
+    let admin_scope = web::scope("/api/admins").service(create_admin);
+
     conf.service(auth_scope);
     conf.service(users_scope);
+    conf.service(admin_scope);
 }

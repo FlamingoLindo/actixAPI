@@ -6,7 +6,7 @@ use uuid::Uuid;
 #[allow(non_snake_case)]
 pub struct RoleModel {
     pub id: Uuid,
-    pub name: Uuid,
+    pub name: String,
     pub description: Option<String>,
     #[serde(rename = "createdAt")]
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
