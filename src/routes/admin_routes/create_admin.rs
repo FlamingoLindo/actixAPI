@@ -2,6 +2,8 @@ use crate::models::admin::admin::AdminModel;
 use crate::models::role::role::RoleModel;
 use crate::{AppState, models::admin::dto::create_admin::CreateAdminSchema};
 use actix_web::{HttpResponse, Responder, post, web};
+use argon2::Argon2;
+use argon2::password_hash::{PasswordHasher, SaltString, rand_core::OsRng};
 use serde_json::json;
 
 #[post("/")]
@@ -37,6 +39,18 @@ pub async fn create_admin(
 
     let role = role_query.unwrap();
 
+    let salt = SaltString::generate(&mut OsRng);
+    let argon2 = Argon2::default();
+
+    let password_hash = match argon2.hash_password(body.password.as_bytes(), &salt) {
+        Ok(hash) => hash.to_string(),
+        Err(e) => {
+            return HttpResponse::InternalServerError().json(
+                json!({"status": "error", "message": format!("Password hashing failed: {:?}", e)}),
+            );
+        }
+    };
+
     let query_result = sqlx::query_as!(
         AdminModel,
         "INSERT INTO admins
@@ -44,7 +58,7 @@ pub async fn create_admin(
         values ($1, $2, $3) 
         returning *",
         body.username,
-        body.password,
+        password_hash,
         role.id
     )
     .fetch_one(&data.db)
