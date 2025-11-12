@@ -1,14 +1,15 @@
-use crate::AppState;
 use crate::middleware::auth::create_jwt;
-use crate::models::user::user::UserModel;
+use crate::{AppState, models::admin::admin::AdminModel};
 use actix_web::{HttpResponse, Responder, post, web};
+use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 #[derive(Debug, Deserialize)]
 pub struct LoginSchema {
-    pub steam_id: String,
+    pub username: String,
+    pub password: String,
     pub refresh: Option<bool>,
     pub refresh_token: Option<String>,
 }
@@ -24,9 +25,7 @@ pub struct LoginResponse {
 
 #[derive(Debug, Serialize)]
 pub struct UserInfo {
-    pub steam_id: String,
     pub username: String,
-    pub avatar: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -43,25 +42,46 @@ pub async fn login(body: web::Json<LoginSchema>, data: web::Data<AppState>) -> i
 
     let want_refresh = body.refresh.unwrap_or(false);
 
-    handle_login(&body.steam_id, data, want_refresh).await
+    handle_login(&body.username, &body.password, data, want_refresh).await
 }
 
 async fn handle_login(
-    steam_id: &str,
+    username: &str,
+    password: &str,
     data: web::Data<AppState>,
     want_refresh: bool,
 ) -> HttpResponse {
     let query_result = sqlx::query_as!(
-        UserModel,
-        "SELECT * FROM users WHERE steam_id = $1",
-        steam_id
+        AdminModel,
+        "SELECT * FROM admins WHERE username = $1",
+        username
     )
     .fetch_one(&data.db)
     .await;
 
     match query_result {
         Ok(user) => {
-            let access_token = match create_jwt(&user.steam_id, false) {
+            let parsed_hash = match PasswordHash::new(&user.password) {
+                Ok(hash) => hash,
+                Err(_) => {
+                    return HttpResponse::InternalServerError().json(json!({
+                        "status": "error",
+                        "message": "Invalid password hash format"
+                    }));
+                }
+            };
+
+            if Argon2::default()
+                .verify_password(password.as_bytes(), &parsed_hash)
+                .is_err()
+            {
+                return HttpResponse::Unauthorized().json(json!({
+                    "status": "error",
+                    "message": "Invalid credentials"
+                }));
+            }
+
+            let access_token = match create_jwt(&user.username, false) {
                 Ok(token) => token,
                 Err(_) => {
                     return HttpResponse::InternalServerError().json(json!({
@@ -72,7 +92,7 @@ async fn handle_login(
             };
 
             let refresh_token = if want_refresh {
-                match create_jwt(&user.steam_id, true) {
+                match create_jwt(&user.username, true) {
                     Ok(token) => Some(token),
                     Err(_) => {
                         return HttpResponse::InternalServerError().json(json!({
@@ -90,9 +110,7 @@ async fn handle_login(
                 access_token,
                 refresh_token,
                 user: UserInfo {
-                    steam_id: user.steam_id,
                     username: user.username,
-                    avatar: user.avatar,
                 },
             };
 

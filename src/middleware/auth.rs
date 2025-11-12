@@ -12,7 +12,7 @@ pub struct Claims {
     pub token_type: String,
 }
 
-pub fn create_jwt(steam_id: &str, refresh: bool) -> Result<String, jsonwebtoken::errors::Error> {
+pub fn create_jwt(username: &str, refresh: bool) -> Result<String, jsonwebtoken::errors::Error> {
     let jwt_secret = std::env::var("JWT_SECRET").expect("No jwt secret in the .env!");
 
     let now = Utc::now();
@@ -24,7 +24,7 @@ pub fn create_jwt(steam_id: &str, refresh: bool) -> Result<String, jsonwebtoken:
     };
 
     let claims = Claims {
-        sub: steam_id.to_owned(),
+        sub: username.to_owned(),
         exp: expires_at.timestamp() as usize,
         iat: now.timestamp() as usize,
         token_type: if refresh {
