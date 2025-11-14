@@ -10,7 +10,7 @@ use actix_web::{HttpResponse, Responder, post, web};
 use chrono::DateTime;
 use serde_json::json;
 
-#[post("/")]
+#[post("")]
 pub async fn create_user(
     body: web::Json<CreateUserSchema>,
     data: web::Data<AppState>,

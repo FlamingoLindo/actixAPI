@@ -44,20 +44,19 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let cors = Cors::default()
             .allowed_origin("http://localhost:3000")
-            .allowed_methods(vec!["GET", "POST", "PUT", "PATCH", "DELETE"])
+            .allowed_methods(vec!["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
             .allowed_headers(vec![
                 header::CONTENT_TYPE,
                 header::AUTHORIZATION,
                 header::ACCEPT,
             ])
             .supports_credentials();
-
         App::new()
+            .wrap(cors)
+            .wrap(Logger::default())
             .app_data(actix_web::web::Data::new(AppState { db: pool.clone() }))
             .service(health_checker_handler)
             .configure(config)
-            .wrap(cors)
-            .wrap(Logger::default())
     })
     .bind(("127.0.0.1", 8000))?
     .run()
