@@ -1,0 +1,44 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT steam_id, username, avatar, pf_url, current_game FROM users",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "steam_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "avatar",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "pf_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "current_game",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "b88e66b0638bccd16801c5c7d93787b82e540c7b8f3a3566b7f26ec77627808b"
+}

@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT steam_id, username, avatar, pf_url, current_game, country, persona_state, steam_created_at, visibility FROM users WHERE steam_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "steam_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "avatar",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "pf_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "current_game",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "country",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "persona_state",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "steam_created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "visibility",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "5a1d65c9cf21ff46e2b37ae905e3edd5c99e31ca8ca5aacfc9f23b7f91cf7a6c"
+}

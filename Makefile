@@ -16,6 +16,9 @@ migrate:
 migrate-revert:
 	sqlx migrate revert
 
+prepare:
+	cargo sqlx prepare
+
 confuse:
 	cargo metadata --format-version 1 | Out-Null
 
