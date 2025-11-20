@@ -18,14 +18,16 @@ pub fn config(conf: &mut web::ServiceConfig) {
         .service(create_user)
         .service(update_user)
         .service(get_user)
+        .service(get_users)
         .service(
             web::scope("")
-                .wrap(auth_middleware)
-                .service(get_users)
+                .wrap(auth_middleware.clone())
                 .service(delete_user),
         );
 
-    let admin_scope = web::scope("/api/admins").service(create_admin);
+    let admin_scope = web::scope("/api/admins")
+        .wrap(auth_middleware)
+        .service(create_admin);
 
     conf.service(auth_scope);
     conf.service(users_scope);

@@ -7,7 +7,7 @@ use crate::models::dto::{
 use actix_web::{HttpResponse, Responder, get, web};
 use serde_json::json;
 
-#[get("/")]
+#[get("")]
 pub async fn get_users(data: web::Data<AppState>) -> impl Responder {
     let query_result = sqlx::query_as!(
         GetUsers,
