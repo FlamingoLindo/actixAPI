@@ -20,9 +20,6 @@ jobs:
       - name: Install SQLx CLI
         run: cargo install sqlx-cli --no-default-features --features postgres
 
-      - name: Create SQLx queries
-        run: cargo sqlx prepare
-
       - name: Check SQLx prepared queries
         run: cargo sqlx prepare --check
 
