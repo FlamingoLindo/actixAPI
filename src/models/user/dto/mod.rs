@@ -5,5 +5,4 @@ pub mod update_user;
 
 pub use create_user::{CreateUserSchema, UserCreationResponse};
 pub use get_user::{GetUser, GetUserResponse};
-pub use get_users::{GetUsers, GetUsersResponse};
 pub use update_user::{UpdateUserSchema, UserUpdateResponse};

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::ResponseStatus;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GetUsers {
     pub steam_id: String,
     pub username: String,
@@ -12,8 +12,17 @@ pub struct GetUsers {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct PaginationMeta {
+    pub total_in_page: usize,
+    pub total: i64,
+    pub total_pages: i64,
+    pub current_page: i64,
+    pub page_size: i64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetUsersResponse {
     pub status: ResponseStatus,
-    pub count: usize,
     pub users: Vec<GetUsers>,
+    pub pagination: PaginationMeta,
 }

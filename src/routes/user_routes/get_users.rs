@@ -1,34 +1,26 @@
 use crate::AppState;
-use crate::models::ResponseStatus;
-use crate::models::dto::{
-    GetUsers, GetUsersResponse,
-};
-
-use actix_web::{HttpResponse, Responder, get, web};
+use crate::models::user::constants::{MAX_PAGE_SIZE, MIN_PAGE_SIZE};
+use crate::models::user::pagination::user_pagination::QueryParams;
+use crate::services::user_service::UserService;
+use actix_web::{HttpResponse, get, web};
 use serde_json::json;
 
 #[get("")]
-pub async fn get_users(data: web::Data<AppState>) -> impl Responder {
-    let query_result = sqlx::query_as!(
-        GetUsers,
-        "SELECT steam_id, username, avatar, pf_url, current_game FROM users"
-    )
-    .fetch_all(&data.db)
-    .await;
+pub async fn get_users(data: web::Data<AppState>, params: web::Query<QueryParams>) -> HttpResponse {
+    let page = params.page.max(1);
+    let limit = params.limit.clamp(MIN_PAGE_SIZE, MAX_PAGE_SIZE);
 
-    if query_result.is_err() {
-        let message = "There has been an error when trying to fetch all users, please try again!";
-        return HttpResponse::InternalServerError()
-            .json(json!({"status": "error", "message": message}));
+    let username_filter = params.username.as_deref();
+
+    match UserService::get_users_paginated(&data.db, username_filter, page, limit).await {
+        Ok(response) => HttpResponse::Ok().json(response),
+        Err(e) => {
+            eprintln!("Database error fetching users: {:?}", e);
+
+            HttpResponse::InternalServerError().json(json!({
+                "status": "error",
+                "message": "Failed to fetch users"
+            }))
+        }
     }
-
-    let users = query_result.unwrap();
-
-    let response_dto = GetUsersResponse {
-        status: ResponseStatus::Success,
-        count: users.len(),
-        users: users,
-    };
-
-    HttpResponse::Ok().json(response_dto)
 }
