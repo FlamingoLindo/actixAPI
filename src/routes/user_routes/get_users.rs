@@ -12,7 +12,7 @@ pub async fn get_users(data: web::Data<AppState>, params: web::Query<QueryParams
 
     let username_filter = params.username.as_deref();
 
-    match UserService::get_users_paginated(&data.db, username_filter, page, limit).await {
+    match UserService::get_users(&data.db, username_filter, page, limit).await {
         Ok(response) => HttpResponse::Ok().json(response),
         Err(e) => {
             eprintln!("Database error fetching users: {:?}", e);

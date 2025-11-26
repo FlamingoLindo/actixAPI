@@ -1,12 +1,29 @@
 use crate::models::ResponseStatus;
+use crate::models::dto::{CreateUserSchema, UserCreationResponse};
 use crate::models::user::dto::get_users::{GetUsersResponse, PaginationMeta};
 use crate::repositories::user_repository::UserRepository;
+use crate::steam::steam_api_response::SteamResponse;
+use chrono::DateTime;
 use sqlx::PgPool;
 
 pub struct UserService;
 
+#[derive(Debug)]
+pub enum UserServiceError {
+    UserAlreadyExists,
+    SteamApiError(String),
+    SteamUserNotFound,
+    DatabaseError(sqlx::Error),
+}
+
+impl From<sqlx::Error> for UserServiceError {
+    fn from(err: sqlx::Error) -> Self {
+        UserServiceError::DatabaseError(err)
+    }
+}
+
 impl UserService {
-    pub async fn get_users_paginated(
+    pub async fn get_users(
         pool: &PgPool,
         username: Option<&str>,
         page: i64,
@@ -38,5 +55,67 @@ impl UserService {
         };
 
         Ok(response)
+    }
+
+    async fn fetch_steam_data(steam_id: &str) -> Result<SteamResponse, UserServiceError> {
+        dotenv::dotenv().ok();
+        let key = std::env::var("STEAM_KEY")
+            .map_err(|_| UserServiceError::SteamApiError("Steam API Key not found".to_string()))?;
+
+        let steam_api = format!(
+            "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={}&steamids={}&format=json",
+            key, steam_id
+        );
+
+        let response = reqwest::get(&steam_api)
+            .await
+            .map_err(|e| UserServiceError::SteamApiError(format!("Failed to fetch: {:?}", e)))?;
+
+        response
+            .json()
+            .await
+            .map_err(|e| UserServiceError::SteamApiError(format!("Failed to parse: {:?}", e)))
+    }
+
+    pub async fn create_user(
+        pool: &PgPool,
+        steam_id: String,
+    ) -> Result<UserCreationResponse, UserServiceError> {
+        let existing_user = UserRepository::check_if_user_exits(pool, &steam_id).await?;
+        if existing_user {
+            return Err(UserServiceError::UserAlreadyExists);
+        }
+
+        let steam_data = Self::fetch_steam_data(&steam_id).await?;
+
+        let players = steam_data.response.players;
+        let user = players
+            .into_iter()
+            .next()
+            .ok_or(UserServiceError::SteamUserNotFound)?;
+
+        let timestamp = user.timecreated.unwrap_or(0);
+        let formatted_steam_created_at = DateTime::from_timestamp(timestamp, 0);
+
+        let create_schema = CreateUserSchema {
+            steam_id,
+            personaname: user.personaname,
+            profileurl: user.profileurl,
+            avatar: user.avatar,
+            personastate: user.personastate,
+            communityvisibilitystate: user.communityvisibilitystate,
+            formatted_steam_created_at,
+            gameextrainfo: user.gameextrainfo,
+            loccountrycode: user.loccountrycode,
+        };
+
+        // Create user in database
+        let db_user = UserRepository::create_user(pool, create_schema).await?;
+
+        Ok(UserCreationResponse {
+            username: db_user.username,
+            pf_url: db_user.pf_url,
+            avatar: db_user.avatar,
+        })
     }
 }
