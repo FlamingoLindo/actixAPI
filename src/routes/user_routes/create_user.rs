@@ -1,7 +1,7 @@
 use crate::{
     AppState,
     models::dto::create_user::CreateUserRequest,
-    services::user_service::{UserService, UserServiceError},
+    services::user_service::{UserService, CreateUserError},
 };
 use actix_web::{HttpResponse, Responder, post, web};
 use serde_json::json;
@@ -18,21 +18,21 @@ pub async fn create_user(
             "data": { "user": user_response }
         })),
         Err(e) => match e {
-            UserServiceError::UserAlreadyExists => HttpResponse::Conflict().json(json!({
+            CreateUserError::UserAlreadyExists => HttpResponse::Conflict().json(json!({
                 "status": "error",
                 "message": "This user is already registered in the database!"
             })),
-            UserServiceError::SteamUserNotFound => HttpResponse::NotFound().json(json!({
+            CreateUserError::SteamUserNotFound => HttpResponse::NotFound().json(json!({
                 "status": "error",
                 "message": "Steam user not found"
             })),
-            UserServiceError::SteamApiError(msg) => {
+            CreateUserError::SteamApiError(msg) => {
                 HttpResponse::InternalServerError().json(json!({
                     "status": "error",
                     "message": format!("Steam API error: {}", msg)
                 }))
             }
-            UserServiceError::DatabaseError(err) => {
+            CreateUserError::DatabaseError(err) => {
                 HttpResponse::InternalServerError().json(json!({
                     "status": "error",
                     "message": format!("Database error: {:?}", err)

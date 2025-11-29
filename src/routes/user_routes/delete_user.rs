@@ -1,22 +1,36 @@
-use crate::AppState;
+use crate::{
+    AppState,
+    services::user_service::{DeleteUserError, UserService},
+};
 
 use actix_web::{HttpResponse, Responder, delete, web};
+use serde_json::json;
 use uuid::Uuid;
 
 #[delete("/user/{id}")]
-async fn delete_user(path: web::Path<Uuid>, data: web::Data<AppState>) -> impl Responder {
-    let user_id = path.into_inner();
-    let rows_affected = sqlx::query!("DELETE FROM users WHERE id = $1", user_id)
-        .execute(&data.db)
-        .await
-        .unwrap()
-        .rows_affected();
-
-    if rows_affected == 0 {
-        let message = format!("User with ID: {} not found!", user_id);
-        return HttpResponse::NotFound()
-            .json(serde_json::json!({"status": "fail", "message": message}));
+async fn delete_user(user_id: web::Path<Uuid>, data: web::Data<AppState>) -> impl Responder {
+    match UserService::delete_user(&data.db, user_id.into_inner()).await {
+        Ok(rows) => {
+            if rows > 0 {
+                HttpResponse::NoContent().finish()
+            } else {
+                HttpResponse::NotFound().json(json!({
+                    "status": "error",
+                    "message": "User not found"
+                }))
+            }
+        }
+        Err(e) => match e {
+            DeleteUserError::UserNotFound => HttpResponse::NotFound().json(json!({
+                "status": "error",
+                "message": "User not found"
+            })),
+            DeleteUserError::DatabaseError(msg) => {
+                HttpResponse::InternalServerError().json(json!({
+                    "status": "error",
+                    "message": format!("Database error: {}", msg)
+                }))
+            }
+        },
     }
-
-    HttpResponse::NoContent().finish()
 }

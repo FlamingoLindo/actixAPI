@@ -5,20 +5,33 @@ use crate::repositories::user_repository::UserRepository;
 use crate::steam::steam_api_response::SteamResponse;
 use chrono::DateTime;
 use sqlx::PgPool;
+use uuid::Uuid;
 
 pub struct UserService;
 
 #[derive(Debug)]
-pub enum UserServiceError {
+pub enum CreateUserError {
     UserAlreadyExists,
     SteamApiError(String),
     SteamUserNotFound,
     DatabaseError(sqlx::Error),
 }
 
-impl From<sqlx::Error> for UserServiceError {
-    fn from(err: sqlx::Error) -> Self {
-        UserServiceError::DatabaseError(err)
+impl From<sqlx::Error> for CreateUserError {
+    fn from(error: sqlx::Error) -> Self {
+        CreateUserError::DatabaseError(error)
+    }
+}
+
+#[derive(Debug)]
+pub enum DeleteUserError {
+    UserNotFound,
+    DatabaseError(sqlx::Error),
+}
+
+impl From<sqlx::Error> for DeleteUserError {
+    fn from(error: sqlx::Error) -> Self {
+        DeleteUserError::DatabaseError(error)
     }
 }
 
@@ -57,10 +70,10 @@ impl UserService {
         Ok(response)
     }
 
-    async fn fetch_steam_data(steam_id: &str) -> Result<SteamResponse, UserServiceError> {
+    async fn fetch_steam_data(steam_id: &str) -> Result<SteamResponse, CreateUserError> {
         dotenv::dotenv().ok();
         let key = std::env::var("STEAM_KEY")
-            .map_err(|_| UserServiceError::SteamApiError("Steam API Key not found".to_string()))?;
+            .map_err(|_| CreateUserError::SteamApiError("Steam API Key not found".to_string()))?;
 
         let steam_api = format!(
             "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={}&steamids={}&format=json",
@@ -69,21 +82,21 @@ impl UserService {
 
         let response = reqwest::get(&steam_api)
             .await
-            .map_err(|e| UserServiceError::SteamApiError(format!("Failed to fetch: {:?}", e)))?;
+            .map_err(|e| CreateUserError::SteamApiError(format!("Failed to fetch: {:?}", e)))?;
 
         response
             .json()
             .await
-            .map_err(|e| UserServiceError::SteamApiError(format!("Failed to parse: {:?}", e)))
+            .map_err(|e| CreateUserError::SteamApiError(format!("Failed to parse: {:?}", e)))
     }
 
     pub async fn create_user(
         pool: &PgPool,
         steam_id: String,
-    ) -> Result<UserCreationResponse, UserServiceError> {
+    ) -> Result<UserCreationResponse, CreateUserError> {
         let existing_user = UserRepository::check_if_user_exits(pool, &steam_id).await?;
         if existing_user {
-            return Err(UserServiceError::UserAlreadyExists);
+            return Err(CreateUserError::UserAlreadyExists);
         }
 
         let steam_data = Self::fetch_steam_data(&steam_id).await?;
@@ -92,7 +105,7 @@ impl UserService {
         let user = players
             .into_iter()
             .next()
-            .ok_or(UserServiceError::SteamUserNotFound)?;
+            .ok_or(CreateUserError::SteamUserNotFound)?;
 
         let timestamp = user.timecreated.unwrap_or(0);
         let formatted_steam_created_at = DateTime::from_timestamp(timestamp, 0);
@@ -109,7 +122,6 @@ impl UserService {
             loccountrycode: user.loccountrycode,
         };
 
-        // Create user in database
         let db_user = UserRepository::create_user(pool, create_schema).await?;
 
         Ok(UserCreationResponse {
@@ -117,5 +129,14 @@ impl UserService {
             pf_url: db_user.pf_url,
             avatar: db_user.avatar,
         })
+    }
+
+    pub async fn delete_user(pool: &PgPool, user_id: Uuid) -> Result<u64, DeleteUserError> {
+        let rows = UserRepository::delete_user(pool, user_id).await?;
+        if rows == 0 {
+            return Err(DeleteUserError::UserNotFound);
+        }
+
+        Ok(rows)
     }
 }

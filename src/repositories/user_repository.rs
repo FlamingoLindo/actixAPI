@@ -3,6 +3,7 @@ use crate::models::{
     user::{dto::get_users::GetUsers, user::UserModel},
 };
 use sqlx::{Error as SqlxError, PgPool};
+use uuid::Uuid;
 
 pub struct UserRepository;
 
@@ -112,5 +113,14 @@ impl UserRepository {
         body.gameextrainfo,
         body.loccountrycode
         ).fetch_one(pool).await
+    }
+
+    pub async fn delete_user(pool: &PgPool, user_id: Uuid) -> Result<u64, SqlxError> {
+        let rows = sqlx::query!("DELETE FROM users WHERE id = $1", user_id)
+            .execute(pool)
+            .await?
+            .rows_affected();
+
+        Ok(rows)
     }
 }
