@@ -2,38 +2,14 @@ use crate::models::ResponseStatus;
 use crate::models::dto::{CreateUserSchema, UserCreationResponse};
 use crate::models::user::dto::get_users::{GetUsersResponse, PaginationMeta};
 use crate::repositories::user_repository::UserRepository;
+use crate::services::errors::users::create_errors::CreateUserError;
+use crate::services::errors::users::delete_erros::DeleteUserError;
 use crate::steam::steam_api_response::SteamResponse;
 use chrono::DateTime;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 pub struct UserService;
-
-#[derive(Debug)]
-pub enum CreateUserError {
-    UserAlreadyExists,
-    SteamApiError(String),
-    SteamUserNotFound,
-    DatabaseError(sqlx::Error),
-}
-
-impl From<sqlx::Error> for CreateUserError {
-    fn from(error: sqlx::Error) -> Self {
-        CreateUserError::DatabaseError(error)
-    }
-}
-
-#[derive(Debug)]
-pub enum DeleteUserError {
-    UserNotFound,
-    DatabaseError(sqlx::Error),
-}
-
-impl From<sqlx::Error> for DeleteUserError {
-    fn from(error: sqlx::Error) -> Self {
-        DeleteUserError::DatabaseError(error)
-    }
-}
 
 impl UserService {
     pub async fn get_users(

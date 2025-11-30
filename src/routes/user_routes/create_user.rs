@@ -1,7 +1,7 @@
 use crate::{
     AppState,
     models::dto::create_user::CreateUserRequest,
-    services::user_service::{UserService, CreateUserError},
+    services::{errors::users::create_errors::CreateUserError, user_service::UserService},
 };
 use actix_web::{HttpResponse, Responder, post, web};
 use serde_json::json;
