@@ -1,9 +1,10 @@
 use crate::models::ResponseStatus;
-use crate::models::dto::{CreateUserSchema, UserCreationResponse};
+use crate::models::dto::{CreateUserSchema, GetUserResponse, UserCreationResponse};
 use crate::models::user::dto::get_users::{GetUsersResponse, PaginationMeta};
 use crate::repositories::user_repository::UserRepository;
 use crate::services::errors::users::create_errors::CreateUserError;
 use crate::services::errors::users::delete_erros::DeleteUserError;
+use crate::services::errors::users::get_user::GetUserError;
 use crate::steam::steam_api_response::SteamResponse;
 use chrono::DateTime;
 use sqlx::PgPool;
@@ -114,5 +115,21 @@ impl UserService {
         }
 
         Ok(rows)
+    }
+
+    pub async fn get_user(pool: &PgPool, steam_id: &str) -> Result<GetUserResponse, GetUserError> {
+        let existing_user = UserRepository::check_if_user_exits(pool, steam_id).await?;
+        if !existing_user {
+            return Err(GetUserError::UserNotFound);
+        }
+
+        let user = UserRepository::get_user(pool, steam_id).await?;
+
+        let response = GetUserResponse {
+            status: ResponseStatus::Success,
+            user,
+        };
+
+        Ok(response)
     }
 }

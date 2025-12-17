@@ -14,13 +14,9 @@ pub async fn get_users(data: web::Data<AppState>, params: web::Query<QueryParams
 
     match UserService::get_users(&data.db, username_filter, page, limit).await {
         Ok(response) => HttpResponse::Ok().json(response),
-        Err(e) => {
-            eprintln!("Database error fetching users: {:?}", e);
-
-            HttpResponse::InternalServerError().json(json!({
-                "status": "error",
-                "message": "Failed to fetch users"
-            }))
-        }
+        Err(_e) => HttpResponse::InternalServerError().json(json!({
+            "status": "error",
+            "message": "Failed to fetch users"
+        })),
     }
 }
