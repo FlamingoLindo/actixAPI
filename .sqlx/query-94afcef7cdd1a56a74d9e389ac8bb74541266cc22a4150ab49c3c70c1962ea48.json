@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT steam_id, username, avatar, pf_url, current_game, country, persona_state, steam_created_at, visibility FROM users WHERE steam_id = $1",
+  "query": "SELECT steam_id, username,avatar,pf_url,country,current_game,persona_state,visibility,steam_created_at FROM users WHERE steam_id = $1",
   "describe": {
     "columns": [
       {
@@ -25,12 +25,12 @@
       },
       {
         "ordinal": 4,
-        "name": "current_game",
+        "name": "country",
         "type_info": "Varchar"
       },
       {
         "ordinal": 5,
-        "name": "country",
+        "name": "current_game",
         "type_info": "Varchar"
       },
       {
@@ -40,13 +40,13 @@
       },
       {
         "ordinal": 7,
-        "name": "steam_created_at",
-        "type_info": "Timestamptz"
+        "name": "visibility",
+        "type_info": "Int4"
       },
       {
         "ordinal": 8,
-        "name": "visibility",
-        "type_info": "Int4"
+        "name": "steam_created_at",
+        "type_info": "Timestamptz"
       }
     ],
     "parameters": {
@@ -66,5 +66,5 @@
       false
     ]
   },
-  "hash": "5a1d65c9cf21ff46e2b37ae905e3edd5c99e31ca8ca5aacfc9f23b7f91cf7a6c"
+  "hash": "94afcef7cdd1a56a74d9e389ac8bb74541266cc22a4150ab49c3c70c1962ea48"
 }
