@@ -1,0 +1,65 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE users SET username = $1, pf_url = $2, avatar = $3, persona_state = $4, visibility = $5, current_game = $6, country = $7, updated_at = NOW() WHERE steam_id = $8 RETURNING username, pf_url, avatar, persona_state, visibility, current_game, country",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "pf_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "avatar",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "persona_state",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "visibility",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "current_game",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "country",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Text",
+        "Text",
+        "Int4",
+        "Int4",
+        "Varchar",
+        "Varchar",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "30b46d6f1ecb1b3953499f53b70ae7ed8322328a3e7a4767b3934a989e8f2873"
+}

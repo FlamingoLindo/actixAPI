@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT steam_id, username,avatar,pf_url,country,current_game,persona_state,visibility,steam_created_at FROM users WHERE steam_id = $1",
+  "query": "SELECT steam_id, username, avatar, pf_url, country, current_game, persona_state, visibility, steam_created_at FROM users WHERE steam_id = $1",
   "describe": {
     "columns": [
       {
@@ -66,5 +66,5 @@
       false
     ]
   },
-  "hash": "94afcef7cdd1a56a74d9e389ac8bb74541266cc22a4150ab49c3c70c1962ea48"
+  "hash": "bd4a44dd987aa5536f15d24b1d0acaf026feccedf5f3797624473516c1ca91cd"
 }

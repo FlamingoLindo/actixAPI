@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+use crate::models::ResponseStatus;
+
 #[derive(Serialize, Deserialize, Debug)]
-pub struct UpdateUserSchema {
+pub struct UpdateUser {
     pub username: Option<String>,
     pub pf_url: Option<String>,
     pub avatar: Option<String>,
@@ -12,8 +14,6 @@ pub struct UpdateUserSchema {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct UserUpdateResponse {
-    pub username: String,
-    pub pf_url: String,
-    pub avatar: String,
+pub struct UpdateUserResponse {
+    pub message: ResponseStatus,
 }

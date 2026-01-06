@@ -1,10 +1,13 @@
 use crate::models::ResponseStatus;
-use crate::models::dto::{CreateUserSchema, GetUserResponse, UserCreationResponse};
+use crate::models::dto::{
+    CreateUserSchema, GetUserResponse, UpdateUser, UpdateUserResponse, UserCreationResponse,
+};
 use crate::models::user::dto::get_users::{GetUsersResponse, PaginationMeta};
 use crate::repositories::user_repository::UserRepository;
 use crate::services::errors::users::create_errors::CreateUserError;
 use crate::services::errors::users::delete_erros::DeleteUserError;
 use crate::services::errors::users::get_user::GetUserError;
+use crate::services::errors::users::update_erros::UpdateUserError;
 use crate::steam::steam_api_response::SteamResponse;
 use chrono::DateTime;
 use sqlx::PgPool;
@@ -132,5 +135,48 @@ impl UserService {
         };
 
         Ok(response)
+    }
+
+    pub async fn update_user(
+        pool: &PgPool,
+        steam_id: &str,
+    ) -> Result<UpdateUserResponse, UpdateUserError> {
+        let existing_user = UserRepository::check_if_user_exits(pool, steam_id).await?;
+        if !existing_user {
+            return Err(UpdateUserError::UserNotFound);
+        }
+
+        let steam_data = Self::fetch_steam_data(&steam_id)
+            .await
+            .map_err(|e| match e {
+                CreateUserError::SteamApiError(msg) => UpdateUserError::SteamApiError(msg),
+                CreateUserError::SteamUserNotFound => UpdateUserError::SteamUserNotFound,
+                CreateUserError::DatabaseError(err) => UpdateUserError::DatabaseError(err),
+                CreateUserError::UserAlreadyExists => {
+                    UpdateUserError::DatabaseError(sqlx::Error::RowNotFound)
+                }
+            })?;
+
+        let players = steam_data.response.players;
+        let steam_user = players
+            .into_iter()
+            .next()
+            .ok_or(UpdateUserError::SteamUserNotFound)?;
+
+        let update_body = UpdateUser {
+            username: Some(steam_user.personaname),
+            pf_url: Some(steam_user.profileurl),
+            avatar: Some(steam_user.avatar),
+            persona_state: Some(steam_user.personastate),
+            visibility: Some(steam_user.communityvisibilitystate),
+            current_game: steam_user.gameextrainfo,
+            country: steam_user.loccountrycode,
+        };
+
+        UserRepository::update_user(pool, update_body, steam_id).await?;
+
+        Ok(UpdateUserResponse {
+            message: ResponseStatus::Success,
+        })
     }
 }

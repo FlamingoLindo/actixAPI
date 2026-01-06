@@ -1,5 +1,5 @@
 use crate::models::{
-    dto::{CreateUserSchema, GetUser},
+    dto::{CreateUserSchema, GetUser, update_user::UpdateUser},
     user::{dto::get_users::GetUsers, user::UserModel},
 };
 use sqlx::{Error as SqlxError, PgPool};
@@ -128,7 +128,28 @@ impl UserRepository {
     pub async fn get_user(pool: &PgPool, steam_id: &str) -> Result<GetUser, SqlxError> {
         let fetched_user = sqlx::query_as!(
             GetUser,
-            "SELECT steam_id, username,avatar,pf_url,country,current_game,persona_state,visibility,steam_created_at FROM users WHERE steam_id = $1",
+            "SELECT steam_id, username, avatar, pf_url, country, current_game, persona_state, visibility, steam_created_at FROM users WHERE steam_id = $1",
+            steam_id
+        ).fetch_one(pool).await?;
+
+        Ok(fetched_user)
+    }
+
+    pub async fn update_user(
+        pool: &PgPool,
+        body: UpdateUser,
+        steam_id: &str,
+    ) -> Result<UpdateUser, SqlxError> {
+        let fetched_user = sqlx::query_as!(
+            UpdateUser,
+            "UPDATE users SET username = $1, pf_url = $2, avatar = $3, persona_state = $4, visibility = $5, current_game = $6, country = $7, updated_at = NOW() WHERE steam_id = $8 RETURNING username, pf_url, avatar, persona_state, visibility, current_game, country",
+            body.username,
+            body.pf_url,
+            body.avatar,
+            body.persona_state,
+            body.visibility,
+            body.current_game,
+            body.country,
             steam_id
         ).fetch_one(pool).await?;
 
