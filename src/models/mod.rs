@@ -7,3 +7,5 @@ pub use user::dto;
 pub mod admin;
 
 pub mod role;
+
+pub mod game;

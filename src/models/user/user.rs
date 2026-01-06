@@ -12,10 +12,10 @@ pub struct UserModel {
     pub avatar: String,
     pub persona_state: i32,
     pub visibility: i32,
-    pub gameid: Option<String>,
 
     #[serde(rename = "steamCreatedAt")]
     pub steam_created_at: chrono::DateTime<chrono::Utc>,
+    pub gameid: Option<String>,
     pub current_game: Option<String>,
     pub country: Option<String>,
 

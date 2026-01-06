@@ -7,6 +7,7 @@ use actix_web::web;
 use actix_web_httpauth::middleware::HttpAuthentication;
 
 use super::auth_routes::login::login;
+use super::game_routes::create_game::create_game;
 use crate::middleware::auth::validator;
 
 pub fn config(conf: &mut web::ServiceConfig) {
@@ -25,6 +26,8 @@ pub fn config(conf: &mut web::ServiceConfig) {
                 .service(delete_user),
         );
 
+    let games_scope = web::scope("/api/games").service(create_game);
+
     let admin_scope = web::scope("/api/admins")
         .wrap(auth_middleware)
         .service(create_admin);
@@ -32,4 +35,5 @@ pub fn config(conf: &mut web::ServiceConfig) {
     conf.service(auth_scope);
     conf.service(users_scope);
     conf.service(admin_scope);
+    conf.service(games_scope);
 }
