@@ -32,7 +32,8 @@
         "gameextrainfo",
         "watchexec",
         "httpauth",
-        "ILIKE"
+        "ILIKE",
+        "gameid"
     ],
     "ignoreWords": [],
     "import": [],

@@ -100,8 +100,8 @@ impl UserRepository {
         sqlx::query_as!(
             UserModel,
         "INSERT into users 
-        (steam_id, username, pf_url, avatar, persona_state, visibility, steam_created_at, current_game, country) 
-        values ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+        (steam_id, username, pf_url, avatar, persona_state, visibility, steam_created_at, current_game, gameid, country) 
+        values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
         returning *",
         body.steam_id,
         body.personaname,
@@ -111,6 +111,7 @@ impl UserRepository {
         body.communityvisibilitystate,
         body.formatted_steam_created_at,
         body.gameextrainfo,
+        body.gameid,
         body.loccountrycode
         ).fetch_one(pool).await
     }

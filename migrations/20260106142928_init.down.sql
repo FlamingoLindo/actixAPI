@@ -1,0 +1,1 @@
+-- Add down migration script hereALTER TABLE users DROP COLUMN IF EXISTS gameid;

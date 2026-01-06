@@ -62,6 +62,11 @@
         "ordinal": 11,
         "name": "updated_at",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 12,
+        "name": "gameid",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
@@ -89,7 +94,8 @@
       true,
       true,
       false,
-      false
+      false,
+      true
     ]
   },
   "hash": "c1c7666ab2bd91ea37f5d1d8c3e66606b9f1e7fc73ad68959e2e81915db07ae6"

@@ -28,4 +28,5 @@ pub struct SteamPlayer {
     pub timecreated: Option<i64>,
     pub loccountrycode: Option<String>,
     pub gameextrainfo: Option<String>,
+    pub gameid: Option<String>,
 }

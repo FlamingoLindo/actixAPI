@@ -15,6 +15,7 @@ pub struct CreateUserSchema {
     pub communityvisibilitystate: i32,
     pub formatted_steam_created_at: Option<chrono::DateTime<chrono::Utc>>,
     pub gameextrainfo: Option<String>,
+    pub gameid: Option<String>,
     pub loccountrycode: Option<String>,
 }
 

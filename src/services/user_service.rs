@@ -97,6 +97,7 @@ impl UserService {
             formatted_steam_created_at,
             gameextrainfo: user.gameextrainfo,
             loccountrycode: user.loccountrycode,
+            gameid: user.gameid,
         };
 
         let db_user = UserRepository::create_user(pool, create_schema).await?;
