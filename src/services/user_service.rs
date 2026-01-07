@@ -8,6 +8,7 @@ use crate::services::errors::users::create_errors::CreateUserError;
 use crate::services::errors::users::delete_erros::DeleteUserError;
 use crate::services::errors::users::get_user::GetUserError;
 use crate::services::errors::users::update_erros::UpdateUserError;
+use crate::services::game_service::GameService;
 use crate::steam::steam_api_response::SteamResponse;
 use chrono::DateTime;
 use sqlx::PgPool;
@@ -90,6 +91,8 @@ impl UserService {
         let timestamp = user.timecreated.unwrap_or(0);
         let formatted_steam_created_at = DateTime::from_timestamp(timestamp, 0);
 
+        let gameid = user.gameid.clone();
+
         let create_schema = CreateUserSchema {
             steam_id,
             personaname: user.personaname,
@@ -104,6 +107,10 @@ impl UserService {
         };
 
         let db_user = UserRepository::create_user(pool, create_schema).await?;
+
+        if let Some(game_id) = gameid {
+            let _ = GameService::create_game(pool, game_id).await;
+        }
 
         Ok(UserCreationResponse {
             username: db_user.username,
