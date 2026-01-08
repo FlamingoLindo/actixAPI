@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT into games (appid,name,short_description,header_image,screenshots) values ($1,$2,$3,$4,$5) returning *",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "appid",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "short_description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "header_image",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "screenshots",
+        "type_info": "TextArray"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Varchar",
+        "Text",
+        "Varchar",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "435308ae1f93b66b1b4f6d8d45f1932cafdcb755899fdc3f65e3d5612ace9143"
+}

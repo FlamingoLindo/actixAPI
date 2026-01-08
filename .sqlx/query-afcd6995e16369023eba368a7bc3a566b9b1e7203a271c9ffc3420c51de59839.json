@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT into games (id,appid,name,short_description,header_image,screenshots) values (gen_random_uuid(),$1,$2,$3,$4,$5) returning *",
+  "query": "SELECT * FROM games WHERE appid = $1",
   "describe": {
     "columns": [
       {
@@ -36,11 +36,7 @@
     ],
     "parameters": {
       "Left": [
-        "Varchar",
-        "Varchar",
-        "Text",
-        "Varchar",
-        "TextArray"
+        "Text"
       ]
     },
     "nullable": [
@@ -52,5 +48,5 @@
       true
     ]
   },
-  "hash": "fdb136feba4df88f0b0e780ac4bcecd24560aded99a698821b94709cc3378a99"
+  "hash": "afcd6995e16369023eba368a7bc3a566b9b1e7203a271c9ffc3420c51de59839"
 }
