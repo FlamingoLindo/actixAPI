@@ -2,7 +2,9 @@ use crate::models::ResponseStatus;
 use crate::models::dto::{
     CreateUserSchema, GetUserResponse, UpdateUser, UpdateUserResponse, UserCreationResponse,
 };
+use crate::models::game::dto::BindUserToGameSchema;
 use crate::models::user::dto::get_users::{GetUsersResponse, PaginationMeta};
+use crate::repositories::game_repository::GameRepository;
 use crate::repositories::user_repository::UserRepository;
 use crate::services::errors::users::create_errors::CreateUserError;
 use crate::services::errors::users::delete_erros::DeleteUserError;
@@ -109,7 +111,13 @@ impl UserService {
         let db_user = UserRepository::create_user(pool, create_schema).await?;
 
         if let Some(game_id) = gameid {
-            let _ = GameService::create_game(pool, game_id).await;
+            let created_game = GameService::create_game(pool, game_id).await?;
+
+            let bind_schema = BindUserToGameSchema {
+                user_id: db_user.id,
+                game_id: created_game.id,
+            };
+            GameRepository::bind_user_to_game(pool, bind_schema).await?;
         }
 
         Ok(UserCreationResponse {
@@ -161,6 +169,9 @@ impl UserService {
                 CreateUserError::DatabaseError(err) => UpdateUserError::DatabaseError(err),
                 CreateUserError::UserAlreadyExists => {
                     UpdateUserError::DatabaseError(sqlx::Error::RowNotFound)
+                }
+                CreateUserError::GameCreationError(msg) => {
+                    UpdateUserError::DatabaseError(sqlx::Error::Protocol(msg))
                 }
             })?;
 

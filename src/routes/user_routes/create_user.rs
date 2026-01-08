@@ -38,6 +38,12 @@ pub async fn create_user(
                     "message": format!("Database error: {:?}", err)
                 }))
             }
+            CreateUserError::GameCreationError(msg) => {
+                HttpResponse::InternalServerError().json(json!({
+                    "status": "error",
+                    "message": format!("Game creation error: {}", msg)
+                }))
+            }
         },
     }
 }

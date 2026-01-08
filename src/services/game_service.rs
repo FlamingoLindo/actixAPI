@@ -1,7 +1,7 @@
 use sqlx::PgPool;
 
 use crate::{
-    models::game::{dto::CreateGameSchema, game::GameCreationResponse},
+    models::game::{dto::CreateGameSchema, game::{GameCreationResponse, GetGameResponse}},
     repositories::game_repository::GameRepository,
     services::errors::games::{create_errors::CreateGameError, get_errors::GetGameError},
     steam::steam_api_response::SteamGameResponse,
@@ -74,6 +74,7 @@ impl GameService {
         let game = GameRepository::get_game_by_id(pool, &game_id).await?;
 
         Ok(GameCreationResponse {
+            id: game.id,
             appid: game.appid,
             name: game.name,
             short_description: game.short_description,
@@ -85,10 +86,10 @@ impl GameService {
     pub async fn get_game_by_appid(
         pool: &PgPool,
         appid: &str,
-    ) -> Result<GameCreationResponse, GetGameError> {
+    ) -> Result<GetGameResponse, GetGameError> {
         let game = GameRepository::get_game_by_appid(pool, appid).await?;
 
-        Ok(GameCreationResponse {
+        Ok(GetGameResponse {
             appid: game.appid,
             name: game.name,
             short_description: game.short_description,

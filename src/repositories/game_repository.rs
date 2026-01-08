@@ -1,6 +1,10 @@
 use sqlx::{Error as SqlxError, PgPool};
 
-use crate::models::game::{dto::CreateGameSchema, game::GameModel};
+use crate::models::game::{
+    dto::{BindUserToGameSchema, CreateGameSchema},
+    game::GameModel,
+    user_games::UserGamesModel,
+};
 
 pub struct GameRepository;
 
@@ -40,4 +44,33 @@ impl GameRepository {
             .fetch_one(pool)
             .await
     }
+
+    pub async fn bind_user_to_game(
+        pool: &PgPool,
+        body: BindUserToGameSchema,
+    ) -> Result<UserGamesModel, SqlxError> {
+        sqlx::query_as!(
+            UserGamesModel,
+            "INSERT into user_games (user_id, game_id) values ($1, $2) returning *",
+            body.user_id,
+            body.game_id
+        )
+        .fetch_one(pool)
+        .await
+    }
+
+    // pub async fn check_if_user_already_has_game(
+    //     pool: &PgPool,
+    //     body: CheckIfUserAlreadyHasGame,
+    // ) -> Result<bool, SqlxError> {
+    //     let existing_query = sqlx::query_scalar!(
+    //         "SELECT EXISTS ( SELECT 1 FROM user_games WHERE user_id = $1 AND game_id = $2)",
+    //         body.user_id,
+    //         body.game_id
+    //     )
+    //     .fetch_one(pool)
+    //     .await?;
+
+    //     Ok(existing_query.unwrap_or(false))
+    // }
 }
