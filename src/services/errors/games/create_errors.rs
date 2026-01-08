@@ -1,5 +1,6 @@
 #[derive(Debug)]
 pub enum CreateGameError {
+    #[allow(dead_code)]
     GameAlreadyExists,
     SteamApiError(String),
     SteamGameNotFound,
