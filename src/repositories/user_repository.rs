@@ -128,7 +128,7 @@ impl UserRepository {
     pub async fn get_user(pool: &PgPool, steam_id: &str) -> Result<GetUser, SqlxError> {
         let fetched_user = sqlx::query_as!(
             GetUser,
-            "SELECT steam_id, username, avatar, pf_url, country, current_game, persona_state, visibility, steam_created_at FROM users WHERE steam_id = $1",
+            "SELECT steam_id, username, avatar, pf_url, country, current_game, persona_state, visibility, steam_created_at, gameid FROM users WHERE steam_id = $1",
             steam_id
         ).fetch_one(pool).await?;
 

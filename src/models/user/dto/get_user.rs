@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::models::response_status::ResponseStatus;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetUser {
@@ -12,6 +12,7 @@ pub struct GetUser {
     pub persona_state: i32,
     pub visibility: i32,
     pub steam_created_at: chrono::DateTime<chrono::Utc>,
+    pub gameid: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

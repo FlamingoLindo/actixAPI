@@ -1,11 +1,11 @@
 use crate::{
-    services::{errors::games::get_errors::GetGameError, game_service::GameService},
     AppState,
+    services::{errors::games::get_errors::GetGameError, game_service::GameService},
 };
-use actix_web::{get, web, HttpResponse, Responder};
+use actix_web::{HttpResponse, Responder, get, web};
 use serde_json::json;
 
-#[get("/{appid}")]
+#[get("/game/{appid}")]
 pub async fn get_game(appid: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let appid = appid.into_inner();
 
@@ -19,12 +19,10 @@ pub async fn get_game(appid: web::Path<String>, data: web::Data<AppState>) -> im
                 "status": "error",
                 "message": "Game not found"
             })),
-            GetGameError::DatabaseError(err) => {
-                HttpResponse::InternalServerError().json(json!({
-                    "status": "error",
-                    "message": format!("Database error: {:?}", err)
-                }))
-            }
+            GetGameError::DatabaseError(err) => HttpResponse::InternalServerError().json(json!({
+                "status": "error",
+                "message": format!("Database error: {:?}", err)
+            })),
         },
     }
 }
