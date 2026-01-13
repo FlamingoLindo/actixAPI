@@ -7,9 +7,9 @@ use crate::models::user::dto::get_users::{GetUsersResponse, PaginationMeta};
 use crate::repositories::game_repository::GameRepository;
 use crate::repositories::user_repository::UserRepository;
 use crate::services::errors::users::create_errors::CreateUserError;
-use crate::services::errors::users::delete_erros::DeleteUserError;
+use crate::services::errors::users::delete_errors::DeleteUserError;
 use crate::services::errors::users::get_user::GetUserError;
-use crate::services::errors::users::update_erros::UpdateUserError;
+use crate::services::errors::users::update_errors::UpdateUserError;
 use crate::services::game_service::GameService;
 use crate::steam::steam_api_response::SteamResponse;
 use chrono::DateTime;
@@ -124,6 +124,7 @@ impl UserService {
             username: db_user.username,
             pf_url: db_user.pf_url,
             avatar: db_user.avatar,
+            steam_id: db_user.steam_id,
         })
     }
 
@@ -161,6 +162,9 @@ impl UserService {
             return Err(UpdateUserError::UserNotFound);
         }
 
+        // Get the user ID for game binding
+        let user_id = UserRepository::get_user_id_by_steam_id(pool, steam_id).await?;
+
         let steam_data = Self::fetch_steam_data(&steam_id)
             .await
             .map_err(|e| match e {
@@ -189,9 +193,20 @@ impl UserService {
             visibility: Some(steam_user.communityvisibilitystate),
             current_game: steam_user.gameextrainfo,
             country: steam_user.loccountrycode,
+            gameid: steam_user.gameid,
         };
 
-        UserRepository::update_user(pool, update_body, steam_id).await?;
+        UserRepository::update_user(pool, update_body.clone(), steam_id).await?;
+
+        if let Some(game_id) = update_body.gameid {
+            let created_game = GameService::create_game(pool, game_id).await?;
+
+            let bind_schema = BindUserToGameSchema {
+                user_id,
+                game_id: created_game.id,
+            };
+            GameRepository::bind_user_to_game(pool, bind_schema).await?;
+        }
 
         Ok(UpdateUserResponse {
             message: ResponseStatus::Success,

@@ -1,5 +1,5 @@
 use crate::AppState;
-use crate::services::errors::users::update_erros::UpdateUserError;
+use crate::services::errors::users::update_errors::UpdateUserError;
 use crate::services::user_service::UserService;
 
 use actix_web::{HttpResponse, Responder, patch, web};
@@ -22,6 +22,12 @@ async fn update_user(steam_id: web::Path<String>, data: web::Data<AppState>) -> 
                 "status": "error",
                 "message": format!("Steam API error: {}", msg)
             })),
+            UpdateUserError::GameCreationError(msg) => {
+                HttpResponse::InternalServerError().json(json!({
+                    "status": "error",
+                    "message": format!("Game creation error: {}", msg)
+                }))
+            }
             UpdateUserError::DatabaseError(msg) => {
                 HttpResponse::InternalServerError().json(json!({
                     "status": "error",

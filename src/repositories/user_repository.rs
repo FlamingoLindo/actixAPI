@@ -135,6 +135,14 @@ impl UserRepository {
         Ok(fetched_user)
     }
 
+    pub async fn get_user_id_by_steam_id(pool: &PgPool, steam_id: &str) -> Result<Uuid, SqlxError> {
+        let user_id = sqlx::query_scalar!("SELECT id FROM users WHERE steam_id = $1", steam_id)
+            .fetch_one(pool)
+            .await?;
+
+        Ok(user_id)
+    }
+
     pub async fn update_user(
         pool: &PgPool,
         body: UpdateUser,
@@ -142,7 +150,18 @@ impl UserRepository {
     ) -> Result<UpdateUser, SqlxError> {
         let fetched_user = sqlx::query_as!(
             UpdateUser,
-            "UPDATE users SET username = $1, pf_url = $2, avatar = $3, persona_state = $4, visibility = $5, current_game = $6, country = $7, updated_at = NOW() WHERE steam_id = $8 RETURNING username, pf_url, avatar, persona_state, visibility, current_game, country",
+            "UPDATE users SET 
+                username = COALESCE($1, username), 
+                pf_url = COALESCE($2, pf_url), 
+                avatar = COALESCE($3, avatar), 
+                persona_state = COALESCE($4, persona_state), 
+                visibility = COALESCE($5, visibility), 
+                current_game = $6, 
+                country = COALESCE($7, country), 
+                gameid = $8, 
+                updated_at = NOW() 
+            WHERE steam_id = $9
+            RETURNING username, pf_url, avatar, persona_state, visibility, current_game, country, gameid",
             body.username,
             body.pf_url,
             body.avatar,
@@ -150,6 +169,7 @@ impl UserRepository {
             body.visibility,
             body.current_game,
             body.country,
+            body.gameid,
             steam_id
         ).fetch_one(pool).await?;
 

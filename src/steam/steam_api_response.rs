@@ -1,4 +1,44 @@
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
+
+// Helper function to deserialize strings or integers as i32
+fn deserialize_string_or_int<'de, D>(deserializer: D) -> Result<i32, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum StringOrInt {
+        String(String),
+        Int(i32),
+    }
+
+    match StringOrInt::deserialize(deserializer)? {
+        StringOrInt::String(s) => s.parse::<i32>().map_err(serde::de::Error::custom),
+        StringOrInt::Int(i) => Ok(i),
+    }
+}
+
+// Helper function for optional string or int
+fn deserialize_option_string_or_int<'de, D>(deserializer: D) -> Result<Option<i32>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum StringOrInt {
+        String(String),
+        Int(i32),
+    }
+
+    let opt: Option<StringOrInt> = Option::deserialize(deserializer)?;
+    match opt {
+        Some(StringOrInt::String(s)) => {
+            s.parse::<i32>().map(Some).map_err(serde::de::Error::custom)
+        }
+        Some(StringOrInt::Int(i)) => Ok(Some(i)),
+        None => Ok(None),
+    }
+}
 
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
@@ -52,6 +92,7 @@ pub struct SteamGame {
     pub game_type: String,
     pub name: String,
     pub steam_appid: u32,
+    #[serde(deserialize_with = "deserialize_string_or_int")]
     pub required_age: i32,
     pub is_free: bool,
     pub controller_support: Option<String>,
@@ -99,9 +140,14 @@ pub enum Requirements {
 #[allow(dead_code)]
 pub struct PriceOverview {
     pub currency: Option<String>,
+    #[serde(deserialize_with = "deserialize_option_string_or_int")]
     pub initial: Option<i32>,
-    #[serde(rename = "final")]
+    #[serde(
+        rename = "final",
+        deserialize_with = "deserialize_option_string_or_int"
+    )]
     pub final_price: Option<i32>,
+    #[serde(deserialize_with = "deserialize_option_string_or_int")]
     pub discount_percent: Option<i32>,
     pub initial_formatted: Option<String>,
     pub final_formatted: Option<String>,
@@ -118,6 +164,7 @@ pub struct Platforms {
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Metacritic {
+    #[serde(deserialize_with = "deserialize_string_or_int")]
     pub score: i32,
     pub url: String,
 }
@@ -125,6 +172,7 @@ pub struct Metacritic {
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Category {
+    #[serde(deserialize_with = "deserialize_string_or_int")]
     pub id: i32,
     pub description: String,
 }
@@ -139,6 +187,7 @@ pub struct Genre {
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Screenshot {
+    #[serde(deserialize_with = "deserialize_string_or_int")]
     pub id: i32,
     pub path_thumbnail: String,
     pub path_full: String,
@@ -147,6 +196,7 @@ pub struct Screenshot {
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Movie {
+    #[serde(deserialize_with = "deserialize_string_or_int")]
     pub id: i32,
     pub name: String,
     pub thumbnail: String,
@@ -174,12 +224,14 @@ pub struct Mp4Formats {
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Recommendations {
+    #[serde(deserialize_with = "deserialize_string_or_int")]
     pub total: i32,
 }
 
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Achievements {
+    #[serde(deserialize_with = "deserialize_string_or_int")]
     pub total: i32,
     pub highlighted: Option<Vec<Achievement>>,
 }

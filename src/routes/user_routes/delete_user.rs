@@ -1,6 +1,6 @@
 use crate::{
     AppState,
-    services::{errors::users::delete_erros::DeleteUserError, user_service::UserService},
+    services::{errors::users::delete_errors::DeleteUserError, user_service::UserService},
 };
 
 use actix_web::{HttpResponse, Responder, delete, web};

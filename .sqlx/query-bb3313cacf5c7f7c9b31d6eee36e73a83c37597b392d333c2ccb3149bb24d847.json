@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE users SET username = $1, pf_url = $2, avatar = $3, persona_state = $4, visibility = $5, current_game = $6, country = $7, updated_at = NOW() WHERE steam_id = $8 RETURNING username, pf_url, avatar, persona_state, visibility, current_game, country",
+  "query": "UPDATE users SET \n                username = COALESCE($1, username), \n                pf_url = COALESCE($2, pf_url), \n                avatar = COALESCE($3, avatar), \n                persona_state = COALESCE($4, persona_state), \n                visibility = COALESCE($5, visibility), \n                current_game = $6, \n                country = COALESCE($7, country), \n                gameid = $8, \n                updated_at = NOW() \n            WHERE steam_id = $9\n            RETURNING username, pf_url, avatar, persona_state, visibility, current_game, country, gameid",
   "describe": {
     "columns": [
       {
@@ -37,6 +37,11 @@
         "ordinal": 6,
         "name": "country",
         "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "gameid",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
@@ -46,6 +51,7 @@
         "Text",
         "Int4",
         "Int4",
+        "Varchar",
         "Varchar",
         "Varchar",
         "Text"
@@ -58,8 +64,9 @@
       false,
       false,
       true,
+      true,
       true
     ]
   },
-  "hash": "30b46d6f1ecb1b3953499f53b70ae7ed8322328a3e7a4767b3934a989e8f2873"
+  "hash": "bb3313cacf5c7f7c9b31d6eee36e73a83c37597b392d333c2ccb3149bb24d847"
 }

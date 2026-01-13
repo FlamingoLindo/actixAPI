@@ -24,4 +24,6 @@ pub struct UserCreationResponse {
     pub username: String,
     pub pf_url: String,
     pub avatar: String,
+    pub steam_id: String,
 }
+
