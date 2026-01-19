@@ -9,3 +9,5 @@ pub mod admin;
 pub mod role;
 
 pub mod game;
+
+pub mod inventory;

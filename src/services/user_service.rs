@@ -11,6 +11,7 @@ use crate::services::errors::users::delete_errors::DeleteUserError;
 use crate::services::errors::users::get_user::GetUserError;
 use crate::services::errors::users::update_errors::UpdateUserError;
 use crate::services::game_service::GameService;
+use crate::services::inventory_service::InventoryService;
 use crate::steam::steam_api_response::SteamResponse;
 use chrono::DateTime;
 use sqlx::PgPool;
@@ -119,6 +120,9 @@ impl UserService {
             };
             GameRepository::bind_user_to_game(pool, bind_schema).await?;
         }
+
+        let cloned_steam_id = user.steamid.clone();
+        let _ = InventoryService::create_inventory(pool, cloned_steam_id).await;
 
         Ok(UserCreationResponse {
             username: db_user.username,
