@@ -11,3 +11,5 @@ pub mod role;
 pub mod game;
 
 pub mod inventory;
+
+pub mod inventory_items;

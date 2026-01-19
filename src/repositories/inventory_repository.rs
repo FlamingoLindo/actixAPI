@@ -38,4 +38,21 @@ impl InventoryRepository {
         .fetch_one(pool)
         .await
     }
+
+    pub async fn get_inventory_id_by_steam_id(
+        pool: &PgPool,
+        steam_id: &str,
+    ) -> Result<Option<uuid::Uuid>, SqlxError> {
+        let result = sqlx::query_scalar!(
+            "SELECT i.id 
+            FROM inventories i
+            INNER JOIN users u ON u.id = i.user_id
+            WHERE u.steam_id = $1",
+            steam_id
+        )
+        .fetch_optional(pool)
+        .await?;
+
+        Ok(result)
+    }
 }

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT EXISTS(\n            SELECT 1 \n            FROM users u\n            INNER JOIN inventories i ON u.id = i.user_id\n            WHERE u.steam_id = $1\n        );",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "9135c111721b8e0898c281a239ac28084c8c57b768e5c932c2f798fa3a0bcbe3"
+}

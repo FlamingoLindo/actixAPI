@@ -4,3 +4,4 @@ pub mod health_route;
 pub mod user_routes;
 pub mod admin_routes;
 pub mod game_routes;
+pub mod inventory_items_routes;

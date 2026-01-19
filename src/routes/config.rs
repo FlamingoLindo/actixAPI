@@ -8,6 +8,7 @@ use actix_web_httpauth::middleware::HttpAuthentication;
 
 use super::auth_routes::login::login;
 use super::game_routes::{create_game::create_game, get_game::get_game};
+use super::inventory_items_routes::fetch_inventory::fetch_inventory;
 use crate::middleware::auth::validator;
 
 pub fn config(conf: &mut web::ServiceConfig) {
@@ -34,8 +35,12 @@ pub fn config(conf: &mut web::ServiceConfig) {
         .wrap(auth_middleware)
         .service(create_admin);
 
+    let inventory_items_scope = web::scope("/api/inventory-items")
+        .service(fetch_inventory);
+
     conf.service(auth_scope);
     conf.service(users_scope);
     conf.service(admin_scope);
     conf.service(games_scope);
+    conf.service(inventory_items_scope);
 }

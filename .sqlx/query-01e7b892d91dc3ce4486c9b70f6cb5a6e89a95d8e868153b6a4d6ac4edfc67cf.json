@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT i.id \n            FROM inventories i\n            INNER JOIN users u ON u.id = i.user_id\n            WHERE u.steam_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "01e7b892d91dc3ce4486c9b70f6cb5a6e89a95d8e868153b6a4d6ac4edfc67cf"
+}
